@@ -37,7 +37,8 @@
 
 	<!-- PAGE LEVEL SCRIPTS -->
 	<link href="/static/assets/css/header-1.css" rel="stylesheet" type="text/css" />
-	<link href="/static/assets/css/color_scheme/blue.css" rel="stylesheet" type="text/css" id="color_scheme" /> {% block style %}{% endblock %}
+	<link href="/static/assets/css/color_scheme/blue.css" rel="stylesheet" type="text/css" id="color_scheme" />
+	{% block style %}{% endblock %}
 	{%if controller.setup.WEB_TONGJI%}
 	<!--统计代码-->
 	{{controller.setup.WEB_TONGJI|safe}}
@@ -67,7 +68,7 @@
 		data-background="assets/images/boxed_background/1.jpg"
 	-->
 
-<body class="smoothscroll enable-animation">
+<body class="smoothscroll enable-animation ">
 
 	<!-- SLIDE TOP -->
 	{% include "./slidetop.html" %}
@@ -87,31 +88,28 @@
 		<!-- REVOLUTION SLIDER -->
 		{% block content %}{% endblock %}
 		<!-- FOOTER -->
-		<footer id="footer">
+		<footer id="footer" class="footer-light" >
 			<div class="container">
 
 				<div class="row">
 
 					<div class="col-md-3">
 						<!-- Footer Logo -->
-						<img class="footer-logo" src="/static/assets/images/logo-footer.png" alt="" />
-
-						<!-- Small Description -->
-						<p>简单而强大的内容管理框架,让WEB开发更快速!</p>
+						<img class="footer-logo" src="/static/assets/images/logo-footer-dark.png" alt="" />
 
 						<!-- Contact Address -->
 						<address>
 								<ul class="list-unstyled">
 									<li class="footer-sprite address">
-										中国 陕西<br>
-										西安雁塔区高新路<br>
-										望庭国际1号楼2单元24层<br>
+										中国 陕西
+										西安雁塔区高新路
+										望庭国际1号楼2单元24层
 									</li>
-									<li class="footer-sprite phone">
-										电话: 86-029-88365435
-									</li>
+									<!--<li class="footer-sprite phone">-->
+										<!--电话: 86-029-88365435-->
+									<!--</li>-->
 									<li class="footer-sprite email">
-										<a href="mailto:admin@cmswing.com">admin@cmswing.com</a>
+										<a href="mailto:arterli@cmswing.com">arterli@cmswing.com</a>
 									</li>
 								</ul>
 							</address>
@@ -122,20 +120,15 @@
 					<div class="col-md-3">
 
 						<!-- Latest Blog Post -->
-						<h4 class="letter-spacing-1">最新公告</h4>
+						<h4 class="letter-spacing-1">功能更新</h4>
 						<ul class="footer-posts list-unstyled">
+							{% topic data = "data",limit= "3",cid="118"%}
+							{%for t in data%}
 							<li>
-								<a href="#">Donec sed odio dui. Nulla vitae elit libero, a pharetra augue</a>
-								<small>29 June 2015</small>
+								<a href="{{t.name|get_url(t.id)}}">{{t.title}}</a>
+								<small>{{t.update_time|moment('lll')}}</small>
 							</li>
-							<li>
-								<a href="#">Nullam id dolor id nibh ultricies</a>
-								<small>29 June 2015</small>
-							</li>
-							<li>
-								<a href="#">Duis mollis, est non commodo luctus</a>
-								<small>29 June 2015</small>
-							</li>
+							{%endfor%}
 						</ul>
 						<!-- /Latest Blog Post -->
 
@@ -144,15 +137,15 @@
 					<div class="col-md-2">
 
 						<!-- Links -->
-						<h4 class="letter-spacing-1">了解 CmsWing</h4>
+						<h4 class="letter-spacing-1">认识我们</h4>
 						<ul class="footer-links list-unstyled">
-							<li><a href="#">网站首页</a></li>
-							<li><a href="#">关于我们</a></li>
-							<li><a href="#">二次开发</a></li>
+							<li><a href="/">网站首页</a></li>
+							<li><a href="/about.html">关于我们</a></li>
+							<li><a href="/documentation">二次开发</a></li>
 							<li><a href="#">模板开发</a></li>
-							<li><a href="#">帮助中心</a></li>
-							<li><a href="#">我们的服务</a></li>
-							<li><a href="#">联系我们</a></li>
+							<li><a href="/tutorial">捐助我们</a></li>
+							<li><a href="/disclaimer.html">免责声明</a></li>
+							<li><a href="/licence.html">授权协议</a></li>
 						</ul>
 						<!-- /Links -->
 
@@ -167,9 +160,9 @@
 						<form class="validate" action="php/newsletter.php" method="post" data-success="Subscribed! Thank you!" data-toastr-position="bottom-right">
 							<div class="input-group">
 								<span class="input-group-addon"><i class="fa fa-envelope"></i></span>
-								<input type="email" id="email" name="email" class="form-control required" placeholder="Enter your Email">
+								<input type="email" id="email" name="email" class="form-control required" placeholder="请输入您的邮箱">
 								<span class="input-group-btn">
-										<button class="btn btn-success" type="submit">Subscribe</button>
+										<button class="btn btn-primary" type="submit">订阅</button>
 									</span>
 							</div>
 						</form>
@@ -327,23 +320,30 @@
 #}
 
 	<!-- JAVASCRIPT FILES -->
+
+	<script type="text/javascript" src="/static/assets/plugins/jquery/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript">
 		var plugin_path = '/static/assets/plugins/';
+		$(function () {
+			if($("#topMain.nav-pills>li.active>a")){
+				var w = $("#topMain.nav-pills>li.active>a").width();
+				$("#topMain.nav-pills>li.active>.aline").width(w);
+			}
+
+		})
 	</script>
-	<script type="text/javascript" src="/static/assets/plugins/jquery/jquery-2.1.4.min.js"></script>
-
 	<script type="text/javascript" src="/static/assets/js/scripts.js"></script>
-
+{#
 	<!-- STYLESWITCHER - REMOVE -->
 	<script async type="text/javascript" src="/static/assets/plugins/styleswitcher/styleswitcher.js"></script>
-
+#}
 	<!-- REVOLUTION SLIDER -->
 	<script type="text/javascript" src="/static/assets/plugins/slider.revolution/js/jquery.themepunch.tools.min.js"></script>
 	<script type="text/javascript" src="/static/assets/plugins/slider.revolution/js/jquery.themepunch.revolution.min.js"></script>
 	<script type="text/javascript" src="/static/assets/js/view/demo.revolution_slider.js"></script>
 	{% block script %}{% endblock %}
     <!--[if lte IE 9]>
-<script src="/static/assets/plugins/jquery-fly/requestAnimationFrame.js"></script>
+    <script src="/static/assets/plugins/jquery-fly/requestAnimationFrame.js"></script>
 <![endif]-->
 </body>
 

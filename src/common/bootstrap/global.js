@@ -454,7 +454,8 @@ global.get_attribute_type = function(type) {
         'suk': ['商品规格', 'text NOT NULL'],
         'pics': ['多图上传', 'varchar(255) NOT NULL'],
         'price': ['价格', 'varchar(255) NOT NULL'],
-        'freight': ['运费', 'varchar(255) NOT NULL']
+        'freight': ['运费', 'varchar(255) NOT NULL'],
+        'keyword': ['关键词', 'varchar(255) NOT NULL']
     }
     return type ? _type[type][0] : _type;
 }
@@ -1042,7 +1043,7 @@ global.checkMobile = function(agent) {
     //排除 Windows 桌面系统  
     if (!(agent.indexOf("windows nt") > -1) || (agent.indexOf("windows nt") > -1 && agent.indexOf("compatible; msie 9.0;") > -1)) {
         //排除苹果桌面系统  
-        if (!(agent.indexOf("windows nt") > -1) && !agent.indexOf("macintosh") > -1) {
+        if (!(agent.indexOf("windows nt") > -1) && !agent.indexOf("macintosh") > -1 && !(agent.indexOf("ipad")>-1)) {
             for (let item of keywords) {
                 if (agent.indexOf(item) > -1) {
                     flag = true;
@@ -1131,7 +1132,7 @@ global.get_file=async (file_id,field,key=false)=>{
     let file = await think.model('file', think.config("db")).find(file_id);
     if(file.location==1 && key){
         let name = await think.cache("setup");
-        file.savename = `http://${name.QINIU_DOMAIN_NAME}/${file.savename}?attname=`
+        file.savename = `http://${name.QINIU_DOMAIN_NAME}/${file.savename}?download/${file.savename}`
     }
     return think.isEmpty(field) ? file : file[field];
 }

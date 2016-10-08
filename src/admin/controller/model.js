@@ -45,6 +45,7 @@ export default class extends Base {
             let res = await this.db.add(data);
             if (res) {
                 this.cache("get_document_model", null);//清除模型缓存
+                this.cache("get_model", null);//清除模型缓存
                 return this.success({name: "添加成功", url: "/admin/model/index"});
             }
         } else {
@@ -69,6 +70,7 @@ export default class extends Base {
             let res =await this.db.update(post);
             if(res){
                 this.cache("get_document_model", null);//清除模型缓存
+                this.cache("get_model", null);//清除模型缓存
                 return this.success({name:"更新模型成功!",url: "/admin/model/index"})
             }
         } else {
@@ -89,7 +91,7 @@ export default class extends Base {
             } else {
                 allfields = fields;
             }
-            // console.log(allfields)
+           // console.log(allfields)
             //梳理属性的可见性
             for (let field of allfields) {
                 if (!think.isEmpty(data.attribute_list) && !in_array(field.id, data.attribute_list)) {
@@ -128,9 +130,12 @@ export default class extends Base {
 
                 }
             }
-           // console.log(field_sort);
-           // console.log(obj)
-            this.assign({'fields': fields, 'extend_fields': extend_fields, 'allfields': obj, 'info': data})
+            console.log(obj);
+            let order = think._.values(obj);
+            //console.log(order);
+            let orderbgy = think._.orderBy(order, ['group', 'sort'], ['asc', 'asc']);
+
+            this.assign({'fields': fields, 'extend_fields': extend_fields, 'allfields': orderbgy, 'info': data})
             this.active = "admin/model/index"
             this.meta_title = "编辑模型"
             this.display();
@@ -158,6 +163,7 @@ export default class extends Base {
             this.fail("删除失败");
         } else {
             this.cache("get_document_model", null);//清除模型缓存
+            this.cache("get_model", null);//清除模型缓存
             this.success({name: "删除成功！"});
         }
     }

@@ -53,12 +53,20 @@ export default class extends Base {
     cate = think.extend({}, cate);
     //seo
     this.meta_title = info.title; //标题
-    this.keywords = info.title ? info.title : ''; //seo关键词
+    this.keywords = info.keyname ? info.keyname : ''; //seo关键词
     this.description = info.description ? info.description : ""; //seo描述
-
+    //keywords
+    let keywords;
+    if(!think.isEmpty(info.keyname)){
+      keywords = (info.keyname).split(",");
+    }
+    this.assign("keywords",keywords);
     //访问统计
     await document.where({id:info.id}).increment('view');
-
+    //外链
+    if(!think.isEmpty(info.link_id)&&info.link_id!=0){
+      return this.redirect(info.link_id);
+    }
     //获取面包屑信息
     let breadcrumb = await this.model('category',{},'admin').get_parent_category(cate.id,true);
     this.assign('breadcrumb', breadcrumb);
@@ -123,9 +131,11 @@ export default class extends Base {
     //console.log(ptree);
     this.assign('topid',pid);
     this.assign("ptree",ptree);
+
     //如果是目录并且模板为空,模块为视频时，目录id，显示最后更新的主题
-    if(info.type == 1 && think.isEmpty(info.template)&&info.model_id==6){
+    if(info.type == 1 && (think.isEmpty(info.template)||info.template==0)&&info.model_id==6){
       if(plist[0]){
+        console.log(111111);
         let model_id =  plist[0].model_id;
         let p_id = plist[0].id;
         let table = await this.model("model",{},"admin").get_table_name(model_id);
@@ -134,7 +144,6 @@ export default class extends Base {
 
       }
     }
-
     //console.log(info);
     this.assign('info', info);
     //判断浏览客户端
@@ -175,20 +184,53 @@ export default class extends Base {
    * 下载
    */
   async downloadgetidAction(){
-    let id = this.get("id");
-    let location = await this.model('file').where({id:id}).getField("location",true);
-    console.log(location);
-    let key = await get_file(id,"savename");
-    console.log(key);
-    let type;
-    if(this.setup.IS_QINIU==1 && location==1){
-      let qiniu = think.service("qiniu");
-      let instance = new qiniu();
-      let info = await instance.stat(key);
-      type = info.mimeType;
-    }
-    let down = await get_file(id,"savename",true);
-    //this.type(type);
-    return this.redirect(down+"?attname=");
+    let id = this.get("id").split("||");
+      let db = this.model('document_download');
+      let info =await db.find(id[0]);
+      console.log(info);
+      let file_id = info.file_id;
+      console.log(file_id);
+      let dlink;
+      if(id[1]==1){
+          let location = await this.model('file').where({id:file_id}).getField("location",true);
+          console.log(location);
+          let d = await get_file(file_id);
+          if(this.setup.IS_QINIU==1 && location==1){
+            //七牛下载
+             // dlink = await get_file(file_id,"savename",true);
+            let qiniu = think.service("qiniu");
+            let instance = new qiniu();
+                dlink = await instance.download(d.savename);
+          }else {
+              // 本地下载
+              dlink = d.savepath+d.savename+"?attname="
+          }
+          console.log(dlink);
+          //访问统计
+        await db.where({id:info.id}).increment('download');
+        //return this.redirect(dlink);
+        this.assign("durl",dlink);
+        return this.display()
+      }else if(id[1]==2){
+          dlink = id[2];
+        await db.where({id:info.id}).increment('download');
+        return this.redirect(dlink);
+      }else if(id[1]==3){
+        //返回网盘提取码
+        let pan = info.panurl.split("\r\n");
+        for(let v of pan){
+          let varr=v.split("|");
+          console.log(varr[1]);
+          if(!think.isEmpty(varr[2]) && think._.trim(id[2])==think._.trim(varr[1])){
+            this.assign({
+              title:varr[0],
+              durl:varr[1],
+              sn:varr[2]
+            })
+          }
+        }
+        return this.display()
+      }
+
   }
 }

@@ -88,6 +88,7 @@ export default class extends Base {
       return this.display(`mobile/${this.http.controller}/${this.http.action}`)
     }else{
       //debugger;
+      //console.log(think.datetime(new Date(), "YYYY-MM-DD"));
       return this.display();
     }
 
@@ -102,13 +103,18 @@ export default class extends Base {
     if(cate.mold == 2){
       type = 'sp';
     }
+    let action = "index";
+    if(cate.mold == 1){
+      action = await  await this.model("model",{},"admin").get_model(cate.model,'name');
+    }
+
     switch (type){
       case 0:
-         await this.action("cover", "index");
+         await this.action("cover", action);
             break;
       case 1:
       case 2:
-         await this.action("list","index");
+         await this.action("list",action);
             break;
       case 'sp':
          await this.action("sp","index");
